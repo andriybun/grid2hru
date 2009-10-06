@@ -1,5 +1,5 @@
-#ifndef HRUDATA
-#define HRUDATA
+#ifndef HRUSTAT
+#define HRUSTAT
 
 #include <iostream>
 #include <vector>
@@ -9,7 +9,7 @@
 #include <cmath>
 
 #include "gridMap.h"
-#include "hruData.h"
+#include "hruStat.h"
 
 using namespace std;
 
@@ -159,6 +159,8 @@ void hruStat::SaveToFile(string fileName)
       ss << i << "\t";
       bool hasValue = false;
       for (int timePer = 0; timePer < data.size(); timePer++) {
+        cout << data[timePer][i].second << endl;
+        system("pause");
         if (data[timePer][i].second != 0) {
           ss << getStat(timePer, i) << "\t";
           hasValue = true;
