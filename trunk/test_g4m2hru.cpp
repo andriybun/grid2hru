@@ -3,7 +3,7 @@
 #include <sstream>
 
 #include "gridMap.h"
-#include "hruData.cpp"
+#include "hruStat.cpp"
 
 using namespace std;
 
