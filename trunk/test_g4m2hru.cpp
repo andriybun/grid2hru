@@ -7,9 +7,6 @@
 
 using namespace std;
 
-void readFile_xydata(double xMin, double yMin, double cellSize, HRUdataAvg &d, 
-                     gridMap<int> &map_HRU, string fileName);
-
 int main() 
  {
 //  calling constructor from XY data text file:
@@ -26,7 +23,9 @@ int main()
 // calling constructor from binary file:
 //  gridMap<float> landArea = gridMap<float>("landarea_grid.bin","bin");
 //  gridMap<int> object = gridMap<int>("HRU_GRID.bin","bin");  
-  HRUdataAvg popdens = HRUdataAvg();
+  hruStat popdens = hruStat("HRU_GRID.bin", "AVG");
+// 3rd parameter is optional:
+//   hruStat popdens = hruStat("HRU_GRID.bin", "AVG", "HRU_GRID.bin");
   popdens.readXYdata(-180, -90, 0.5/6, "iiasapopdensb2_hru.txt");
   popdens.SaveToFile_bin("-delete-me.bin");
   popdens.SaveToFile("-delete-me.txt");
