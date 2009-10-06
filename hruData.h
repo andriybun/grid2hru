@@ -1,22 +1,28 @@
 class HRUdataAvg {
   private:
 // Type needed for calculation of average value
-// pair.first - total sum of values
-// pair.second - number of components
-// => avg = pair.first / pair.second
+    // pair.first - total sum of values
+    // pair.second - number of components
+    // => avg = pair.first / pair.second
     typedef pair<float, unsigned char> pairAvg;
-    vector<pairAvg> data;
+    typedef vector<pairAvg> pairAvgV;
+    vector<pairAvgV> data;
+// Data containers:
+    // Array containing resulting average values
     double *grid;
-// Functions for data processing
-    double getAvg(int hruID);
+    // 2D array - map of HRU:
+    gridMap<int> hruMap;
+    int NumTimePeriods;
+// Functions for data processing:
+    double getAvg(unsigned char timePer, int hruID);
     double * summary();
   public:
     HRUdataAvg();
     ~HRUdataAvg();
-    void update(int hruID, float val);
-    vector<double> summaryVector();
-    void write_bin(string fileName);
-    void write(string fileName);
+    void update(unsigned char timePer, int hruID, float val);
+    void readXYdata(double xMin, double yMin, double cellSize, string fileName);
+    void SaveToFile_bin(string fileName);
+    void SaveToFile(string fileName);
 };
 
 class HRUdataAvgW {
@@ -27,6 +33,7 @@ class HRUdataAvgW {
 // => avg = pair.first / pair.second
     typedef pair<float, float> pairAvg;
     vector<pairAvg> data;
+// Data containers:
     double *grid;
 // Functions for data processing
     double getAvg(int hruID);

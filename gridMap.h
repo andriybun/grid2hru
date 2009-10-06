@@ -23,17 +23,17 @@ class gridMap {
     gridMap(double, double, double, double, double, TP, string );
     gridMap(string fileName, string fileType);
     gridMap();
+    gridMap(const gridMap<TP> &g);
     ~gridMap();
     void set(double x, double y, TP val);              // assigns value val to cell [x][y]
     TP get(int xInd, int yInd);                        // returns value for a specified cell
     TP getByCoords(double x, double y);                // returns value for the specified coordinates
+    void LoadFromFile_bin(string fileName);
     void SaveToFile(string fileName, string format);   // print map to file
     void SaveToFile_bin(string fileName);              // print map to binary file
 };
 
-#endif
-
-// Class constructor
+// Class constructor (from XY data)
 template <class TP>
 gridMap<TP>::gridMap(double hMin, double hMax, double vMin, double vMax, double Step, 
                TP noData, string fileName)
@@ -52,7 +52,8 @@ gridMap<TP>::gridMap(double hMin, double hMax, double vMin, double vMax, double 
   UpdateResolutions();
   int sizeOfArray = HorResolution * VerResolution;
   grid = new TP[sizeOfArray];
-  memset(grid,noDataValue,sizeOfArray*sizeof(TP));
+  for (int i = 0; i < sizeOfArray; i++) grid[i] = noDataValue;
+//  memset(grid,noDataValue,sizeOfArray*sizeof(TP));
   ifstream f;
   cout << "Opening file: " << fileName << endl;
   f.open(fileName.c_str(),ios::in);
@@ -86,27 +87,10 @@ gridMap<TP>::gridMap(double hMin, double hMax, double vMin, double vMax, double 
 template <class TP>
 gridMap<TP>::gridMap(string fileName, string fileType = "bin")
  {
-
   ifstream f;
 // from binary file
   if (fileType == "bin") {
-    f.open(fileName.c_str(), ios::in | ios::binary);
-    if (f.is_open()) {
-      cout << "Reading data from binary file" << endl;
-      f.read(reinterpret_cast<char *>(&xMin), sizeof(double));
-      f.read(reinterpret_cast<char *>(&xMax), sizeof(double));
-      f.read(reinterpret_cast<char *>(&yMin), sizeof(double));
-      f.read(reinterpret_cast<char *>(&yMax), sizeof(double));
-      f.read(reinterpret_cast<char *>(&cellSize), sizeof(double));
-      f.read(reinterpret_cast<char *>(&noDataValue), sizeof(TP));
-      UpdateResolutions();
-      int sizeOfArray = HorResolution * VerResolution;
-      grid = new TP[sizeOfArray];
-      f.read(reinterpret_cast<char *>(grid), sizeOfArray * sizeof(TP));
-      cout << "Successfully read from binary file: " << fileName << endl;
-    } else {
-      cout << "Unable to open file!" << endl;
-    }
+    LoadFromFile_bin(fileName);
   } else {
 // from ASCII grid file  
     f.open(fileName.c_str(), ios::in);
@@ -193,7 +177,25 @@ gridMap<TP>::gridMap()
   UpdateResolutions();
   int sizeOfArray = HorResolution * VerResolution;
   grid = new TP[sizeOfArray];
-  memset(grid,noDataValue,sizeOfArray*sizeof(TP));
+  for (int i = 0; i < sizeOfArray; i++) grid[i] = noDataValue;
+//  memset(grid,noDataValue,sizeOfArray*sizeof(TP));
+ }
+
+// copy constructor
+template <class TP>
+gridMap<TP>::gridMap(const gridMap<TP> &g) 
+ {
+  HorResolution = g.HorResolution;
+  VerResolution = g.VerResolution;
+  noDataValue = g.noDataValue;
+  xMin = g.xMin;
+  xMax = g.xMax;
+  yMin = g.yMin;
+  yMax = g.yMax;
+  cellSize = g.cellSize;
+  int sizeOfArray = HorResolution * VerResolution;
+  grid = new TP[sizeOfArray];
+  memcpy(grid,g.grid,sizeOfArray*sizeof(TP));
  }
 
 // destructor
@@ -232,6 +234,29 @@ TP gridMap<TP>::getByCoords(double x, double y)
   if ((xInd < 0) || (xInd>=HorResolution) || (yInd < 0) || (yInd>=VerResolution))
     return noDataValue;
   return grid[yInd * (HorResolution) + xInd];
+ }
+
+template <class TP>
+void gridMap<TP>::LoadFromFile_bin(string fileName)
+ {
+  ifstream f;
+  f.open(fileName.c_str(), ios::in | ios::binary);
+  if (f.is_open()) {
+    cout << "Reading data from binary file" << endl;
+    f.read(reinterpret_cast<char *>(&xMin), sizeof(double));
+    f.read(reinterpret_cast<char *>(&xMax), sizeof(double));
+    f.read(reinterpret_cast<char *>(&yMin), sizeof(double));
+    f.read(reinterpret_cast<char *>(&yMax), sizeof(double));
+    f.read(reinterpret_cast<char *>(&cellSize), sizeof(double));
+    f.read(reinterpret_cast<char *>(&noDataValue), sizeof(TP));
+    UpdateResolutions();
+    int sizeOfArray = HorResolution * VerResolution;
+    grid = new TP[sizeOfArray];
+    f.read(reinterpret_cast<char *>(grid), sizeOfArray * sizeof(TP));
+    cout << "Successfully read from binary file: " << fileName << endl;
+  } else {
+    cout << "Unable to open file!" << endl;
+  }
  }
 
 template <class TP>
@@ -293,3 +318,5 @@ void gridMap<TP>::SaveToFile_bin(string fileName)
     cout << "Unable to save to file!" << endl;
   }
  }
+
+#endif
