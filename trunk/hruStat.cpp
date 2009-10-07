@@ -19,13 +19,14 @@ hruStat::hruStat(string hruMapFileName, string stat, string weightFileName="")
 // SUM - sum; AVG - average; AVGW - weightet awg; VAL - value;
  {
   hruMap.LoadFromFile_bin(hruMapFileName);
-  if (weightFileName.length()) weight.LoadFromFile_bin(weightFileName);
   NumTimePeriods = 0;
   if (stat == "SUM") {
     statType = 0;
   } else if (stat == "AVG") {
     statType = 1;
   } else if (stat == "AVGW") {
+    if (weightFileName.length()) weight.LoadFromFile_bin(weightFileName);
+    cout << "Error! Map of weights is missing." << endl;
     statType = 2;
   } else if (stat == "VAL") {
     statType = 3;
@@ -41,8 +42,12 @@ hruStat::~hruStat()
 void hruStat::update(unsigned char timePer, int hruID, float val, float weight = 1)
  {
   if (timePer >= (int)data.size()) data.resize(timePer + 1);
-  if (hruID >= (int)data[timePer].size()) data[timePer].resize(hruID + 1);
+  if (hruID >= (int)data[timePer].size()) {
+    data[timePer].resize(hruID + 1);
+    flags.resize(hruID + 1);
+  }
   if (hruID >= 0) {
+    flags[hruID] = 1;
     switch (statType) {
       case 0: data[timePer][hruID].first += val;
               data[timePer][hruID].second = 0;
@@ -159,9 +164,9 @@ void hruStat::SaveToFile(string fileName)
       ss << i << "\t";
       bool hasValue = false;
       for (int timePer = 0; timePer < data.size(); timePer++) {
-        cout << data[timePer][i].second << endl;
-        system("pause");
-        if (data[timePer][i].second != 0) {
+//        cout << data[timePer][i].second << endl;
+//        system("pause");
+        if (flags[i] == 1) {
           ss << getStat(timePer, i) << "\t";
           hasValue = true;
         }
