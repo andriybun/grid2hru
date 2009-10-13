@@ -25,8 +25,13 @@ hruStat::hruStat(string hruMapFileName, string stat, string weightFileName="")
   } else if (stat == "AVG") {
     statType = 1;
   } else if (stat == "AVGW") {
-    if (weightFileName.length()) weight.LoadFromFile_bin(weightFileName);
-    cout << "Error! Map of weights is missing." << endl;
+    if (weightFileName.length()) 
+      weight.LoadFromFile_bin(weightFileName);
+    else {
+      cout << "Error! Map of weights is missing." << endl;
+      system("pause");
+      exit(1);
+    }
     statType = 2;
   } else if (stat == "VAL") {
     statType = 3;
@@ -164,23 +169,15 @@ void hruStat::SaveToFile(string fileName)
       ss << i << "\t";
       bool hasValue = false;
       for (int timePer = 0; timePer < data.size(); timePer++) {
-//        cout << data[timePer][i].second << endl;
-//        system("pause");
         if (flags[i] == 1) {
           ss << getStat(timePer, i) << "\t";
           hasValue = true;
         }
       }
       if (hasValue) {
-        f << "" << ss.str() << endl;
-//        system("pause");
+        f << ss.str() << endl;
       }
     }
-
-//    for (int i=0; i<result.size(); i++) {
-//      if (!isnan(result[i * numHRU + timePer]))
-//        f << i << "\t" << result[i * numHRU + timePer] << endl;
-//    }
     f.close();
     cout << "Successfully written to text file: " << fileName << endl;
   } else {
