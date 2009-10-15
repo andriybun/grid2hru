@@ -55,10 +55,10 @@ gridMap<TP>::gridMap(double hMin, double hMax, double vMin, double vMax, double 
   for (int i = 0; i < sizeOfArray; i++) grid[i] = noDataValue;
 //  memset(grid,noDataValue,sizeOfArray*sizeof(TP));
   ifstream f;
-  cout << "Opening file: " << fileName << endl;
+  cout << "> Opening file: " << fileName << endl;
   f.open(fileName.c_str(),ios::in);
   if (f.is_open()) {
-    cout << "Started reading data."  << endl;
+    cout << " Started reading data."  << endl;
     int numLines = 0;
     while (!f.eof()) {
       string line;
@@ -75,7 +75,7 @@ gridMap<TP>::gridMap(double hMin, double hMax, double vMin, double vMax, double 
       if ((numLines % 250000) == 0) cout << "Line #" << numLines << endl;
      }
     f.close(); 
-    cout << "Successfully read " << numLines << " lines." << endl;
+    cout << "  Successfully read " << numLines << " lines." << endl;
   } else {
     cout << "Unable to open input file!" << endl;
   }
@@ -95,7 +95,7 @@ gridMap<TP>::gridMap(string fileName, string fileType = "bin")
 // from ASCII grid file  
     f.open(fileName.c_str(), ios::in);
     if (f.is_open()) {
-      cout << "Reading data from ASCII grid file: " << fileName << endl;
+      cout << "> Reading data from ASCII grid file: " << fileName << endl;
       string line;
       // reading grid parameters
       bool param = true;
@@ -156,7 +156,7 @@ gridMap<TP>::gridMap(string fileName, string fileType = "bin")
         l++;
       }
       f.close();
-      cout << "Successfully read from ASCII grid file." << endl;
+      cout << "  Successfully read from ASCII grid file." << endl;
     } else {
       cout << "Unable to open file!" << endl;
     }
@@ -242,7 +242,7 @@ void gridMap<TP>::LoadFromFile_bin(string fileName)
   ifstream f;
   f.open(fileName.c_str(), ios::in | ios::binary);
   if (f.is_open()) {
-    cout << "Reading data from binary file" << endl;
+    cout << "> Reading data from binary file" << endl;
     f.read(reinterpret_cast<char *>(&xMin), sizeof(double));
     f.read(reinterpret_cast<char *>(&xMax), sizeof(double));
     f.read(reinterpret_cast<char *>(&yMin), sizeof(double));
@@ -253,7 +253,7 @@ void gridMap<TP>::LoadFromFile_bin(string fileName)
     int sizeOfArray = HorResolution * VerResolution;
     grid = new TP[sizeOfArray];
     f.read(reinterpret_cast<char *>(grid), sizeOfArray * sizeof(TP));
-    cout << "Successfully read from binary file: " << fileName << endl;
+    cout << "  Successfully read from binary file: " << fileName << endl;
   } else {
     cout << "Unable to open file!" << endl;
   }
@@ -267,24 +267,24 @@ void gridMap<TP>::SaveToFile(string fileName, string format)
   if (f.is_open()) {
 // Select grid format:
 //GRASS ascii Grid
-if (format == "GRASS") {
-    f << "cols: " << HorResolution << endl;
-    f << "rows: " << VerResolution << endl;
-    f << "west: " << xMin << endl;
-    f << "south: " << yMin << endl;
-    f << "north: " << xMin + cellSize * HorResolution << endl;
-    f << "east: " << yMin + cellSize * VerResolution << endl;
-} else if (format == "ESRI") {
+    cout << "> Writing data to grid-file: " << fileName << endl;
+    if (format == "GRASS") {
+      f << "cols: " << HorResolution << endl;
+      f << "rows: " << VerResolution << endl;
+      f << "west: " << xMin << endl;
+      f << "south: " << yMin << endl;
+      f << "north: " << xMin + cellSize * HorResolution << endl;
+      f << "east: " << yMin + cellSize * VerResolution << endl;
+    } else if (format == "ESRI") {
 //----------------------------    
 // ESRI ascii Grid
-    cout << "Writing data to grid-file: " << fileName << endl;
-    f << "NCOLS " << HorResolution << endl;
-    f << "NROWS " << VerResolution << endl;
-    f << "XLLCORNER " << xMin << endl;
-    f << "YLLCORNER " << yMin << endl;
-    f << setprecision (10) << "CELLSIZE " <<  cellSize << endl;
-    f << "NODATA_VALUE " << noDataValue << endl;
-}
+      f << "NCOLS " << HorResolution << endl;
+      f << "NROWS " << VerResolution << endl;
+      f << "XLLCORNER " << xMin << endl;
+      f << "YLLCORNER " << yMin << endl;
+      f << setprecision (10) << "CELLSIZE " <<  cellSize << endl;
+      f << "NODATA_VALUE " << noDataValue << endl;
+    }
 //-----------------------------        
     for (int j = 0; j < VerResolution; j++) {
       for (int i = 0; i < HorResolution; i++) {
@@ -293,7 +293,7 @@ if (format == "GRASS") {
       f << endl;  
     }
     f.close(); 
-    cout << "Successfully written grid to file: " << fileName << endl;
+    cout << "  Successfully written grid to file: " << fileName << endl;
   } else {
     cout << "Unable to save to file!" << endl;
   }
@@ -313,7 +313,7 @@ void gridMap<TP>::SaveToFile_bin(string fileName)
     f.write(reinterpret_cast<char *>(&noDataValue), sizeof(TP));
     int sizeOfArray = HorResolution * VerResolution;
     f.write(reinterpret_cast<char *>(grid), sizeOfArray * sizeof(TP));
-    cout << "Successfully written to binary file: " << fileName << endl;
+    cout << "> Successfully written to binary file: " << fileName << endl;
   } else {
     cout << "Unable to save to file!" << endl;
   }

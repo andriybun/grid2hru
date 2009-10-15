@@ -20,6 +20,7 @@
 g4m2hru::g4m2hru()
  {
   maxNumHRU = 0;
+  info();
 //    gridMap<int> obj = gridMap<int>(-180, 180, -90, 90, 0.5/6, -1, "hru_0833_xy");
 //    obj.SaveToFile_bin("HRU_GRID.bin");
   
@@ -33,12 +34,23 @@ g4m2hru::~g4m2hru()
   }
  }
 
+// Info
+void g4m2hru::info()
+ {
+  cout << endl;
+  for (int i = 0; i < 80; i++) cout << "*";
+  cout << "******** Class for conversion data files from 0.5x0.5 to HRU resolution ********";
+  cout << "******** Author:     Andriy Bun                                         ********";
+  for (int i = 0; i < 80; i++) cout << "*";
+  cout << endl;
+ }
+
 void g4m2hru::addDataFromFile(string fileName, string header)
  {
   ifstream f;
   f.open(fileName.c_str(), ios::in | ios::binary);
   if (f.is_open()) {
-    cout << "Reading data from binary file: " << fileName << endl;
+    cout << "> Reading data from binary file: " << fileName << endl;
     int HRUs, TimePeriods;
     f.read(reinterpret_cast<char *>(&HRUs), sizeof(int));
     numHRU.push_back(HRUs);
@@ -50,7 +62,7 @@ void g4m2hru::addDataFromFile(string fileName, string header)
     data.push_back(poi);
     headers.push_back(header);
     f.close();
-    cout << "Successfully read from binary file: " << fileName << endl;
+    cout << "  Successfully read from binary file: " << fileName << endl;
   } else {
     cout << "Unable to open to file!" << endl;
   }
@@ -61,13 +73,13 @@ void g4m2hru::saveDataToFile(string fileName)
   ofstream f;
   f.open(fileName.c_str(), ios::out);
   if (f.is_open()) {
-    cout << "Saving data to binary file: " << fileName << endl;
+    cout << "> Saving data to file: " << fileName << endl;
     // write header
+    f << "HRUID\t";
     for (int rec = 0; rec < data.size(); rec++)
       for (int timePer = 0; timePer < numTimePeriods[rec]; timePer++)
-        cout << headers[rec] << 2000 + 10 * timePer << "\t";
-    cout << endl;
-    system("pause");
+        f << headers[rec] << 2000 + 10 * timePer << "\t";
+    f << endl;
     // write data
     for (int currHRU = 0; currHRU < maxNumHRU; currHRU++) {
       stringstream ss(stringstream::out);
@@ -81,12 +93,11 @@ void g4m2hru::saveDataToFile(string fileName)
         }
       }
       if (hasValue) {
-        cout  << ss.str() << endl;
-        system("pause");
+        f  << ss.str() << endl;
       }
     }
     f.close();
-    cout << "Successfully read from binary file: " << fileName << endl;
+    cout << "  Successfully written to file: " << fileName << endl;
   } else {
     cout << "Unable to save to file!" << endl;
   }

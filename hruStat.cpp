@@ -102,10 +102,10 @@ double * hruStat::summary()
 void hruStat::readXYdata(double xMin, double yMin, double cellSize, string fileName)
  {
   ifstream f;
-  cout << "Opening file: " << fileName << endl;
+  cout << "> Opening file: " << fileName << endl;
   f.open(fileName.c_str(),ios::in);
   if (f.is_open()) {
-    cout << "Started reading: x y data..."  << endl;
+    cout << "  Started reading: x y data..."  << endl;
     int numLines = 0;
     while (!f.eof()) {
       string line;
@@ -133,7 +133,7 @@ void hruStat::readXYdata(double xMin, double yMin, double cellSize, string fileN
       if ((numLines % 250000) == 0) cout << "Line #" << numLines << endl;
      }
     f.close();
-    cout << "Successfully read " << numLines << " lines." << endl;
+    cout << "  Successfully read " << numLines << " lines." << endl;
   } else {
     cout << "Unable to open input file!" << endl;
   }
@@ -150,7 +150,7 @@ void hruStat::SaveToFile_bin(string fileName)
     double * poi = summary();
     f.write(reinterpret_cast<char *>(poi), numHRU * NumTimePeriods * sizeof(double));
     f.close();
-    cout << "Successfully written to binary file: " << fileName << endl;
+    cout << "> Successfully written to binary file: " << fileName << endl;
   } else {
     cout << "Unable to save to file!" << endl;
   }
@@ -161,7 +161,7 @@ void hruStat::SaveToFile(string fileName)
   ofstream f;
   f.open(fileName.c_str(), ios::out);
   if (f.is_open()) {
-    cout << "Started writing data to file: " << fileName << endl;
+    cout << "> Started writing data to file: " << fileName << endl;
     f << "HRU id\tvalue(s)" << endl;
     int numHRU = data[0].size();
     for (int i = 0; i < numHRU; i++) {
@@ -179,7 +179,7 @@ void hruStat::SaveToFile(string fileName)
       }
     }
     f.close();
-    cout << "Successfully written to text file: " << fileName << endl;
+    cout << "  Successfully written to text file: " << fileName << endl;
   } else {
     cout << "Unable to save to file!" << endl;
   }
