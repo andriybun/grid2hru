@@ -9,6 +9,7 @@ class g4m2hru {
     vector <int> numHRU, numTimePeriods;
     vector <string> headers;
     int maxNumHRU;
+    void info();
   public:
     g4m2hru();
     ~g4m2hru();
