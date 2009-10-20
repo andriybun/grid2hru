@@ -22,8 +22,9 @@ class hruStat {
     double * summary();                               // returns vector of results
   public:
     // Class constructor: input parameters:
-    // hruMapFileName - name of file with HRU map, stored in binary grid format of
-    //     gridMap class;
+    // hruMapFileName - name of file with HRU map;
+    //     if its extension is "*.bin", it assumes that the data is stored in binary grid format of
+    //     gridMap class; else - text file is read;
     // stat - statistics type: SUM - sum; AVG - average; AVGW - weightet awg; 
     //     VAL - value;
     // weightFileName (optional) - name of file with map of weights, stored in 

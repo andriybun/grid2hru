@@ -18,7 +18,12 @@ hruStat::hruStat(string hruMapFileName, string stat, string weightFileName="")
 // Statistics type:
 // SUM - sum; AVG - average; AVGW - weightet awg; VAL - value;
  {
-  hruMap.LoadFromFile_bin(hruMapFileName);
+  if (hruMapFileName.substr(hruMapFileName.length()-4) == ".bin")
+    hruMap.LoadFromFile_bin(hruMapFileName);
+  else {
+    gridMap<int> tmp = gridMap<int>(-180, 180, -90, 90, 0.5/6, -1, hruMapFileName);
+    hruMap = tmp;
+  }
   NumTimePeriods = 0;
   if (stat == "SUM") {
     statType = 0;
