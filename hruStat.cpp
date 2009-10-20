@@ -18,11 +18,13 @@ hruStat::hruStat(string hruMapFileName, string stat, string weightFileName="")
 // Statistics type:
 // SUM - sum; AVG - average; AVGW - weightet awg; VAL - value;
  {
+  emptyHRU = true;
+  emptyGrid = true;
+  emptyW = true;
   if (hruMapFileName.substr(hruMapFileName.length()-4) == ".bin")
-    hruMap.LoadFromFile_bin(hruMapFileName);
+    emptyHRU = !(hruMap.LoadFromFile_bin(hruMapFileName));
   else {
-    gridMap<int> tmp = gridMap<int>(-180, 180, -90, 90, 0.5/6, -1, hruMapFileName);
-    hruMap = tmp;
+    emptyHRU = !(hruMap.LoadFromFile(-180, 180, -90, 90, 0.5/6, -1, hruMapFileName));
   }
   NumTimePeriods = 0;
   if (stat == "SUM") {
@@ -31,7 +33,11 @@ hruStat::hruStat(string hruMapFileName, string stat, string weightFileName="")
     statType = 1;
   } else if (stat == "AVGW") {
     if (weightFileName.length()) 
-      weight.LoadFromFile_bin(weightFileName);
+      if (hruMapFileName.substr(hruMapFileName.length()-4) == ".bin")
+        emptyW = !(weight.LoadFromFile_bin(weightFileName));
+      else {
+        emptyW = !(weight.LoadFromFile(-180, 180, -90, 90, 0.5/6, -1, weightFileName));
+      }
     else {
       cout << "Error! Map of weights is missing." << endl;
       system("pause");
@@ -138,6 +144,7 @@ void hruStat::readXYdata(double xMin, double yMin, double cellSize, string fileN
       if ((numLines % 250000) == 0) cout << "Line #" << numLines << endl;
      }
     f.close();
+    emptyGrid = false;
     cout << "  Successfully read " << numLines << " lines." << endl;
   } else {
     cout << "Unable to open input file!" << endl;
@@ -148,7 +155,9 @@ void hruStat::SaveToFile_bin(string fileName)
  {
   ofstream f;
   f.open(fileName.c_str(), ios::out | ios::binary);
-  if (f.is_open()) {
+  if (emptyHRU || emptyGrid || emptyW) {
+    cout << "  Unable to save to file! Container is empty!" << endl;
+  } else if (f.is_open()) {
     int numHRU = data[0].size();
     f.write(reinterpret_cast<char *>(&numHRU), sizeof(int));
     f.write(reinterpret_cast<char *>(&NumTimePeriods), sizeof(int));
@@ -165,7 +174,9 @@ void hruStat::SaveToFile(string fileName)
  {
   ofstream f;
   f.open(fileName.c_str(), ios::out);
-  if (f.is_open()) {
+  if (emptyHRU || emptyGrid || emptyW) {
+    cout << "  Unable to save to file! Container is empty!" << endl;
+  } else if (f.is_open()) {
     cout << "> Started writing data to file: " << fileName << endl;
     f << "HRU id\tvalue(s)" << endl;
     int numHRU = data[0].size();

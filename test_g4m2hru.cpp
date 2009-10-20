@@ -23,7 +23,7 @@ int main()
 // calling constructor from binary file:
 //  gridMap<float> landArea = gridMap<float>("landarea_grid.bin","bin");
 //  gridMap<int> object = gridMap<int>("HRU_GRID.bin","bin");  
-  hruStat popdens = hruStat("HRU_GRID.bin", "AVGW");
+  hruStat popdens = hruStat("HRU_GRID.bin", "AVG");
 // 3rd parameter is optional:
 //   hruStat popdens = hruStat("HRU_GRID.bin", "AVG", "HRU_GRID.bin");
   popdens.readXYdata(-180, -90, 0.5/6, "iiasapopdensb2_hru.txt");
