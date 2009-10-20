@@ -28,7 +28,8 @@ class gridMap {
     void set(double x, double y, TP val);              // assigns value val to cell [x][y]
     TP get(int xInd, int yInd);                        // returns value for a specified cell
     TP getByCoords(double x, double y);                // returns value for the specified coordinates
-    void LoadFromFile_bin(string fileName);
+    bool LoadFromFile(double , double , double , double , double , TP , string );
+    bool LoadFromFile_bin(string fileName);
     void SaveToFile(string fileName, string format);   // print map to file
     void SaveToFile_bin(string fileName);              // print map to binary file
 };
@@ -237,7 +238,57 @@ TP gridMap<TP>::getByCoords(double x, double y)
  }
 
 template <class TP>
-void gridMap<TP>::LoadFromFile_bin(string fileName)
+bool gridMap<TP>::LoadFromFile(double hMin, double hMax, double vMin, double vMax, double Step, 
+               TP noData, string fileName)
+// hMin, hMax - longitude minimum and maximum values
+// vMin, vMax - latitude minimum and maximum
+// Step - cell size
+// noData - value that will be stored for all cells for which data is missing
+// fileName - path to input text file in format "x y value"
+ {
+  xMin = hMin;
+  xMax = hMax;
+  yMin = vMin;
+  yMax = vMax;
+  cellSize = Step;
+  noDataValue = noData;
+  UpdateResolutions();
+  int sizeOfArray = HorResolution * VerResolution;
+  delete []grid;
+  grid = new TP[sizeOfArray];
+  for (int i = 0; i < sizeOfArray; i++) grid[i] = noDataValue;
+//  memset(grid,noDataValue,sizeOfArray*sizeof(TP));
+  ifstream f;
+  cout << "> Opening file: " << fileName << endl;
+  f.open(fileName.c_str(),ios::in);
+  if (f.is_open()) {
+    cout << " Started reading data."  << endl;
+    int numLines = 0;
+    while (!f.eof()) {
+      string line;
+      getline(f,line);
+      if(line[0] != '#' && line.size()>0) {
+        stringstream ss(line);
+        double x,y;
+        TP val;
+        if ((ss >> val) && (ss >> x) && (ss >> y)) {
+          set(x, y, val);
+          numLines++;
+        }
+      }
+      if ((numLines % 250000) == 0) cout << "Line #" << numLines << endl;
+     }
+    f.close(); 
+    cout << "  Successfully read " << numLines << " lines." << endl;
+    return true;
+  } else {
+    cout << "Unable to open input file!" << endl;
+    return false;
+  }
+ }
+
+template <class TP>
+bool gridMap<TP>::LoadFromFile_bin(string fileName)
  {
   ifstream f;
   f.open(fileName.c_str(), ios::in | ios::binary);
@@ -254,8 +305,10 @@ void gridMap<TP>::LoadFromFile_bin(string fileName)
     grid = new TP[sizeOfArray];
     f.read(reinterpret_cast<char *>(grid), sizeOfArray * sizeof(TP));
     cout << "  Successfully read from binary file: " << fileName << endl;
+    return true;
   } else {
     cout << "Unable to open file!" << endl;
+    return false;
   }
  }
 

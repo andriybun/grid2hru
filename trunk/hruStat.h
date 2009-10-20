@@ -1,3 +1,7 @@
+//  Name: hruStat class
+//  Author: Andriy Bun
+//  Date: 20.10.09
+
 class hruStat {
   private:
 // Type needed for calculation of average value
@@ -17,6 +21,7 @@ class hruStat {
     gridMap<double> weight;
     int NumTimePeriods;  // numbers of time periods in file
     int statType;        // statistics type
+    bool emptyHRU, emptyGrid, emptyW;          // property of containers: if true - container is filled with data
 // Functions for data processing:
     double getStat(unsigned char timePer, int hruID); // returns statistics value
     double * summary();                               // returns vector of results
